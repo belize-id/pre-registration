@@ -117,7 +117,7 @@ public class NotificationServiceUtil {
 
 	@SuppressWarnings("unchecked")
 	public MainRequestDTO<NotificationDTO> createNotificationDetails(String jsonString, String langauageCode,
-			boolean isLatest)
+			boolean isLatest,String prid)
 			throws JsonParseException, JsonMappingException, io.mosip.kernel.core.exception.IOException, JSONException,
 			ParseException, com.fasterxml.jackson.core.JsonParseException,
 			com.fasterxml.jackson.databind.JsonMappingException, IOException {
@@ -144,14 +144,20 @@ public class NotificationServiceUtil {
 			}
 		}
 		if (!isLatest) {
-			notificationDto = (NotificationDTO) JsonUtils.jsonStringToJavaObject(NotificationDTO.class,
-					notificationDtoData.toString());
-			KeyValuePairDto langaueNamePair = new KeyValuePairDto();
-			langaueNamePair.setKey(langauageCode);
-			langaueNamePair.setValue(notificationDto.getName());
-			langaueNamePairs.add(langaueNamePair);
-			notificationDto.setFullName(langaueNamePairs);
-			notificationDto.setLanguageCode(langauageCode);
+			if (prid == null) {
+				notificationDto = (NotificationDTO) JsonUtils.jsonStringToJavaObject(NotificationDTO.class,
+						notificationDtoData.toString());
+				KeyValuePairDto langaueNamePair = new KeyValuePairDto();
+				langaueNamePair.setKey(langauageCode);
+				langaueNamePair.setValue(notificationDto.getName());
+				langaueNamePairs.add(langaueNamePair);
+				notificationDto.setFullName(langaueNamePairs);
+				notificationDto.setLanguageCode(langauageCode);
+			} else {
+				notificationDto = new NotificationDTO();
+				notificationDto.setPreRegistrationId(prid);
+				notificationDto.setLanguageCode(langauageCode);
+			}
 		}
 
 		notificationReqDto.setId(notificationData.get("id").toString());
@@ -165,6 +171,15 @@ public class NotificationServiceUtil {
 		}
 		notificationReqDto.setRequest(notificationDto);
 		return notificationReqDto;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public MainRequestDTO<NotificationDTO> createNotificationDetails(String jsonString, String langauageCode,
+			boolean isLatest)
+			throws JsonParseException, JsonMappingException, io.mosip.kernel.core.exception.IOException, JSONException,
+			ParseException, com.fasterxml.jackson.core.JsonParseException,
+			com.fasterxml.jackson.databind.JsonMappingException, IOException {
+		return createNotificationDetails(jsonString,langauageCode,isLatest,null);	
 	}
 
 	/**

@@ -250,7 +250,12 @@ public class DemographicService implements DemographicServiceIntf {
 	
 	@Value("${mosip.utc-datetime-pattern}")
 	private String mosipDateTimeFormat;
-
+	
+	@Value("${mosip.pre-registration.notification.id}")
+	private String preRegistrationNotificationId;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	/**
 	 * This method acts as a post constructor to initialize the required request
@@ -347,6 +352,9 @@ public class DemographicService implements DemographicServiceIntf {
 			mainResponseDTO.setResponsetime(serviceUtil.getCurrentResponseTime());
 			log.info("sessionId", "idType", "id",
 					"Pre Registration end time : " + DateUtils.getUTCCurrentDateTimeString());
+			request.setId(preRegistrationNotificationId);
+			String jsonString = objectMapper.writeValueAsString(request);
+			notificationService.sendNotification(jsonString, request.getRequest().getLangCode(), null, false, preId);
 		} catch (HttpServerErrorException | HttpClientErrorException e) {
 			log.error("sessionId", "idType", "id", ExceptionUtils.getStackTrace(e));
 			log.error("sessionId", "idType", "id",
