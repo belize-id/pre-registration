@@ -383,9 +383,10 @@ public class NotificationService {
 		List<KeyValuePairDto<String, String>> langaueNamePairs = new ArrayList<KeyValuePairDto<String, String>>();
 		List<KeyValuePairDto<String, String>> langaueNamePairsfullName = new ArrayList<KeyValuePairDto<String, String>>();
 		KeyValuePairDto<String, String> langaueNamePair = null;
+		JsonNode arrayNodecomma = null;
 		for (String name : fullName.split(",")) {
-
-			JsonNode arrayNodecomma = responseNode.get(name);
+			if (responseNode.hasNonNull(name)) {
+				arrayNodecomma = responseNode.get(name);
 
 			if (!arrayNodecomma.isEmpty() || arrayNodecomma != null) {
 
@@ -424,6 +425,7 @@ public class NotificationService {
 				}
 			}
 		}
+	}
 		return langaueNamePairsfullName;
 	}
 
