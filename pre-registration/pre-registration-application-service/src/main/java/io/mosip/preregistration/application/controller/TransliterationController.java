@@ -79,6 +79,7 @@ public class TransliterationController {
 			@Validated @RequestBody(required = true) MainRequestDTO<TransliterationRequestDTO> requestDTO, @ApiIgnore Errors errors) {
 		requestValidator.validateId(TRANS, requestDTO.getId(), errors);
 		DataValidationUtil.validate(errors,TRANS);
-		return ResponseEntity.status(HttpStatus.OK).body(transliterationService.translitratorService(requestDTO));
+		//return ResponseEntity.status(HttpStatus.OK).body(transliterationService.translitratorService(requestDTO));
+		return ResponseEntity.status(HttpStatus.OK).body(transliterationService.getMainResponseDTOResponseEntity(requestDTO));
 	}
 }
