@@ -5,9 +5,6 @@
 package io.mosip.preregistration.application.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import io.mosip.kernel.core.transliteration.spi.Transliteration;
@@ -20,8 +17,6 @@ import io.mosip.preregistration.application.exception.UnSupportedLanguageExcepti
 import io.mosip.preregistration.application.service.util.TransliterationServiceUtil;
 import io.mosip.preregistration.core.common.dto.MainRequestDTO;
 import io.mosip.preregistration.core.common.dto.MainResponseDTO;
-
-import java.util.List;
 
 /**
  * This class provides the service implementation for Transliteration
@@ -46,13 +41,6 @@ public class TransliterationService {
 	@Autowired
 	private TransliterationServiceUtil serviceUtil;
 
-	@Autowired
-	private Environment environment;
-
-	private static final String RESIDENT_TRANSLITERATION_WORKAROUND_PROPERTY = "resident-transliteration-workaround-for-%s-%s";
-	private static final int LANGUAGE_LIST_SIZE = 2;
-	public static final String HYPHEN = "-";
-	public static final String COMMA = ",";
 	/**
 	 * 
 	 * This method is used to transliterate the given data.
@@ -82,43 +70,4 @@ public class TransliterationService {
 		}
 		return responseDTO;
 	}
-	public MainResponseDTO<TransliterationResponseDTO> getMainResponseDTOResponseEntity(MainRequestDTO<TransliterationRequestDTO> requestDTO) {
-		String propertyValue = environment.getProperty(String.format(RESIDENT_TRANSLITERATION_WORKAROUND_PROPERTY,
-				requestDTO.getRequest().getFromFieldLang(), requestDTO.getRequest().getToFieldLang()));
-		if (propertyValue != null) {
-			List<String> propertyValueList = List.of(propertyValue.split(COMMA));
-			MainResponseDTO<TransliterationResponseDTO> responseDTO = null;
-			for(String languagePair:propertyValueList){
-				MainRequestDTO<TransliterationRequestDTO> transliterationRequestDTOMainRequestDTO = new MainRequestDTO<>();
-				TransliterationRequestDTO transliterationRequestDTO = new TransliterationRequestDTO();
-				List<String> languageList = List.of(languagePair.split(HYPHEN));
-				if(languageList.size() == LANGUAGE_LIST_SIZE){
-					transliterationRequestDTO.setFromFieldLang(languageList.get(0));
-					transliterationRequestDTO.setToFieldLang(languageList.get(1));
-					if(responseDTO!=null){
-						transliterationRequestDTO.setFromFieldValue(responseDTO.getResponse().getToFieldValue());
-					} else {
-						transliterationRequestDTO.setFromFieldValue(requestDTO.getRequest().getFromFieldValue());
-					}
-					transliterationRequestDTOMainRequestDTO.setRequest(transliterationRequestDTO);
-					transliterationRequestDTOMainRequestDTO.setId(requestDTO.getId());
-					transliterationRequestDTOMainRequestDTO.setVersion(requestDTO.getVersion());
-					transliterationRequestDTOMainRequestDTO.setRequesttime(requestDTO.getRequesttime());
-					responseDTO = translitratorService(transliterationRequestDTOMainRequestDTO);
-				}
-			}
-			if(responseDTO!=null && responseDTO.getResponse()!=null){
-				TransliterationResponseDTO transliterationResponseDTO = responseDTO.getResponse();
-				transliterationResponseDTO.setToFieldLang(requestDTO.getRequest().getToFieldLang());
-				transliterationResponseDTO.setFromFieldValue(requestDTO.getRequest().getFromFieldValue());
-				transliterationResponseDTO.setFromFieldLang(requestDTO.getRequest().getFromFieldLang());
-				responseDTO.setResponse(transliterationResponseDTO);
-			}
-			return responseDTO;
-
-		} else {
-			return translitratorService(requestDTO);
-		}
-	}
-
 }
