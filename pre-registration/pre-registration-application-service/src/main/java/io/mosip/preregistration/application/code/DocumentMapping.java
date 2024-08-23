@@ -14,7 +14,9 @@ public enum DocumentMapping {
 
 	POE("proofOfException", "POE"),
 	
-	PONC("proofOfNameChange","PONC");
+	PONC("proofOfNameChange","PONC"),
+	
+	POB("proofOfDateOfBirth","POB");
 
 	private final String attributeName;
 
