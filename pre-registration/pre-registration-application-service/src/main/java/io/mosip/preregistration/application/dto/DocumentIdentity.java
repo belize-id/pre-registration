@@ -20,5 +20,8 @@ public class DocumentIdentity {
 	
 	/** Proof of Relation. */
 	private IdentityJsonValues por;
+	
+	/** Proof of Name Change. */
+	private IdentityJsonValues ponc;
 
 }
